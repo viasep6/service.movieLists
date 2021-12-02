@@ -1,0 +1,14 @@
+{
+  "name": "service.lists",
+  "version": "1.0.0",
+  "description": "",
+  "scripts": {
+    "start": "func start",
+    "test": "echo \"No tests yet...\""
+  },
+  "dependencies": {
+    "applicationinsights": "^2.1.9",
+    "firebase-admin": "^10.0.0"
+  },
+  "devDependencies": {}
+}
