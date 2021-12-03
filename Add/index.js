@@ -1,6 +1,10 @@
-const { GetUserMovieLists } = require('../Services/MovieListService')
+const { GetUserMovieLists, AddorUpdateMovieList, AddNewUserAndMovieList } = require('../Services/MovieListService')
 const { admin } = require('../service.shared/Repository/Firebase/admin');
 
+/**
+ * Creates or updates a users movielist.
+ * Completely overwrites movies if list exists.
+ */
 module.exports = async function (context, req) {
     context.log('Request id:', context.executionContext.invocationId);
 
@@ -15,20 +19,28 @@ module.exports = async function (context, req) {
     .auth()
     .verifyIdToken(req.headers.authorization.split('Bearer ')[1])
     .then(async verified => {
+
         return await GetUserMovieLists(verified.user_id)
         .then(lists => {
-            const userHasLists = typeof lists === 'undefined' ? false : true
-            let listFound = false
+            const userHasLists = typeof lists === 'undefined' ? false : true;
+            let isExistingList = false;
+
             if (userHasLists) {
-                if (typeof lists[req.query.list] !== 'undefined') {
-                    return context.res = { body: lists[req.query.list] }
-                }
-                return context.res = { body: lists }
+                isExistingList = typeof lists[req.body.name] === 'undefined' ? false : true;
             }
-    
-            return context.res = {
-                status: 404, 
-                body: 'User does no have any lists.' 
+
+            item = {
+                [req.body.name]: {
+                    updated: new Date().toISOString(),
+                    created: (userHasLists && isExistingList) ? lists[req.body.name].created : new Date().toISOString(),
+                    movies: req.body.movies
+                }
+            };
+
+            userHasLists ? AddorUpdateMovieList(verified.user_id, item) : AddNewUserAndMovieList(verified.user_id, item)
+
+            context.res = {
+                body: 'Success'
             }
         })
     })

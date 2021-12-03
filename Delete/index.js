@@ -1,7 +1,9 @@
-const { GetUserMovieLists } = require('../Services/MovieListService')
 const { admin } = require('../service.shared/Repository/Firebase/admin');
+const { DeleteAllLists, DeleteMovieList } = require('../Services/MovieListService')
 
 module.exports = async function (context, req) {
+    context.log('JavaScript HTTP trigger function processed a request.');
+
     context.log('Request id:', context.executionContext.invocationId);
 
     if (!(req.headers.authorization && req.headers.authorization.startsWith('Bearer '))) {
@@ -15,22 +17,13 @@ module.exports = async function (context, req) {
     .auth()
     .verifyIdToken(req.headers.authorization.split('Bearer ')[1])
     .then(async verified => {
-        return await GetUserMovieLists(verified.user_id)
-        .then(lists => {
-            const userHasLists = typeof lists === 'undefined' ? false : true
-            let listFound = false
-            if (userHasLists) {
-                if (typeof lists[req.query.list] !== 'undefined') {
-                    return context.res = { body: lists[req.query.list] }
-                }
-                return context.res = { body: lists }
-            }
-    
-            return context.res = {
-                status: 404, 
-                body: 'User does no have any lists.' 
-            }
-        })
+        typeof req.query.list === 'undefined' 
+        ? DeleteAllLists(verified.user_id)
+        : DeleteMovieList(verified.user_id, req.query.list)
+
+        context.res = {
+            body: 'Success'
+        }
     })
     .catch ((err) => {
         console.error(err.message);
