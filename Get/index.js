@@ -23,7 +23,11 @@ module.exports = async function (context, req) {
                 if (typeof lists[req.query.list] !== 'undefined') {
                     return context.res = { body: lists[req.query.list] }
                 }
-                return context.res = { body: lists }
+                return context.res = { 
+                    status: 200,
+                    statusText: 'success',
+                    body: lists 
+                }
             }
     
             return context.res = {
