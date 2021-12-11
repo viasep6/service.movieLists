@@ -25,14 +25,14 @@ module.exports = async function (context, req) {
                 }
                 return context.res = { 
                     status: 200,
-                    statusText: 'success',
                     body: lists 
                 }
             }
-    
-            return context.res = {
-                status: 404, 
-                body: 'User does no have any lists.' 
+            else {
+                return context.res = {
+                    status: 404, 
+                    body: 'User does no have any lists.' 
+                }
             }
         })
     })

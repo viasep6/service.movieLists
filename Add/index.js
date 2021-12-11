@@ -1,4 +1,4 @@
-const { GetUserMovieLists, AddorUpdateMovieList, AddNewUserAndMovieList } = require('../Services/MovieListService')
+const { GetUserMovieLists, AddorUpdateMovieList: AddorUpdateMovieCollection, AddNewUserAndMovieList } = require('../Services/MovieListService')
 const { admin } = require('../service.shared/Repository/Firebase/admin');
 
 /**
@@ -21,26 +21,32 @@ module.exports = async function (context, req) {
     .then(async verified => {
 
         return await GetUserMovieLists(verified.user_id)
-        .then(lists => {
-            const userHasLists = typeof lists === 'undefined' ? false : true;
-            let isExistingList = false;
+        .then(async collections => {
+            const userHasCollections = typeof collections === 'undefined' ? false : true;
+            let isExistingCollection = false;
 
-            if (userHasLists) {
-                isExistingList = typeof lists[req.body.name] === 'undefined' ? false : true;
+            if (userHasCollections) {
+                isExistingCollection = typeof collections[req.body.name] === 'undefined' ? false : true;
             }
 
             item = {
                 [req.body.name]: {
                     updated: new Date().toISOString(),
-                    created: (userHasLists && isExistingList) ? lists[req.body.name].created : new Date().toISOString(),
+                    created: (userHasCollections && isExistingCollection) ? collections[req.body.name].created : new Date().toISOString(),
                     movies: req.body.movies
                 }
             };
 
-            userHasLists ? AddorUpdateMovieList(verified.user_id, item) : AddNewUserAndMovieList(verified.user_id, item)
+            let result = {}
+            if (userHasCollections) {
+                result = await AddorUpdateMovieCollection(verified.user_id, item)
+            }
+            else {
+                result = await AddNewUserAndMovieList(verified.user_id, item)
+            }
 
-            context.res = {
-                body: 'Success'
+            return context.res = {
+                body: result
             }
         })
     })

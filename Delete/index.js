@@ -17,12 +17,18 @@ module.exports = async function (context, req) {
     .auth()
     .verifyIdToken(req.headers.authorization.split('Bearer ')[1])
     .then(async verified => {
-        typeof req.query.list === 'undefined' 
-        ? DeleteAllLists(verified.user_id)
-        : DeleteMovieList(verified.user_id, req.query.list)
+        
+        let result = {}
+        if (typeof req.query.list === 'undefined') {
+            await DeleteAllLists(verified.user_id)
+            result = []
+        }
+        else {
+            result =  await DeleteMovieList(verified.user_id, req.query.list)
+        }
 
-        context.res = {
-            body: 'Success'
+        return context.res = {
+            body: result
         }
     })
     .catch ((err) => {
