@@ -47,7 +47,6 @@ exports.DeleteAllLists = async (userId) => await db
 .collection('movieLists')
 .doc(userId)
 .delete()
-.then(async () => await this.GetUserMovieLists(userId))
 .catch ((err) => {
     console.error(err);
     return err;
