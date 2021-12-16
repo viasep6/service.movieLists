@@ -1,7 +1,7 @@
 # Docs for the Azure Web Apps Deploy action: https://github.com/azure/functions-action
 # More GitHub Actions for Azure: https://github.com/Azure/actions
 
-name: Build and deploy Node.js project to Azure Function App - mowits-movieLists
+name: Build and deploy Node.js project to Azure Function App - mowits-service-movielists
 
 on:
   push:
@@ -23,6 +23,7 @@ jobs:
           token: ${{ secrets.CI_TOKEN }}
           submodules: true
 
+
       - name: Setup Node ${{ env.NODE_VERSION }} Environment
         uses: actions/setup-node@v1
         with:
@@ -41,7 +42,7 @@ jobs:
         uses: Azure/functions-action@v1
         id: fa
         with:
-          app-name: 'mowits-movieLists'
+          app-name: 'mowits-service-movielists'
           slot-name: 'Production'
           package: ${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}
-          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_25B60A00A4274A4193A8D4B300EEA7E1 }}
+          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_30ADB9F37D204B61B45C62E1CC07CE3E }}
